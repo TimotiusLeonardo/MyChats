@@ -27,7 +27,7 @@ class LoginController: UIViewController {
         button.layer.cornerRadius = 8
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 16)
-        button.addTarget(self, action: #selector(handleRegister), for: .touchUpInside)
+        button.addTarget(self, action: #selector(handleLoginRegister), for: .touchUpInside)
         return button
     }()
     
@@ -190,7 +190,32 @@ class LoginController: UIViewController {
         return .lightContent
     }
     
-    @objc func handleRegister() {
+    @objc func handleLoginRegister() {
+        if loginRegisterSegmentedControl.selectedSegmentIndex == 0 {
+            handleLogin()
+        } else {
+            handleRegister()
+        }
+    }
+    
+    func handleLogin() {
+        guard let email = emailTextField.text, let password = passwordTextField.text else {
+            print("Form is not valid")
+            return
+        }
+        
+        Auth.auth().signIn(withEmail: email,
+                           password: password) { user, error in
+            if error != nil {
+                print(error?.localizedDescription)
+                return
+            }
+            
+            self.dismiss(animated: true, completion: nil)
+        }
+    }
+    
+    func handleRegister() {
         guard let email = emailTextField.text, let password = passwordTextField.text, let name = nameTextField.text else {
             return
         }
@@ -246,6 +271,6 @@ class LoginController: UIViewController {
         } completion: { _ in
             //
         }
-
+        
     }
 }
