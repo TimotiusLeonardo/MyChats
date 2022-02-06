@@ -214,7 +214,7 @@ class LoginController: UIViewController {
                     return
                 }
                 
-                print("Saved user successfully into database")
+                self.dismiss(animated: true, completion: nil)
             }
         }
     }
