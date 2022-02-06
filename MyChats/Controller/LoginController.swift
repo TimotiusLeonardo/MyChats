@@ -207,7 +207,7 @@ class LoginController: UIViewController {
         Auth.auth().signIn(withEmail: email,
                            password: password) { user, error in
             if error != nil {
-                print(error?.localizedDescription)
+                print(error?.localizedDescription ?? "Error Sign in With Firebase")
                 return
             }
             
