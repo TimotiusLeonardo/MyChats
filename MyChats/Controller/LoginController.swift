@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Firebase
 
 class LoginController: UIViewController {
     
@@ -26,6 +27,7 @@ class LoginController: UIViewController {
         button.layer.cornerRadius = 8
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 16)
+        button.addTarget(self, action: #selector(handleRegister), for: .touchUpInside)
         return button
     }()
     
@@ -33,6 +35,7 @@ class LoginController: UIViewController {
         let tf = UITextField()
         tf.placeholder = "Name"
         tf.translatesAutoresizingMaskIntoConstraints = false
+        tf.autocapitalizationType = .none
         return tf
     }()
     
@@ -47,6 +50,8 @@ class LoginController: UIViewController {
         let tf = UITextField()
         tf.placeholder = "Email"
         tf.translatesAutoresizingMaskIntoConstraints = false
+        tf.autocapitalizationType = .none
+        tf.clearButtonMode = .whileEditing
         return tf
     }()
     
@@ -61,6 +66,8 @@ class LoginController: UIViewController {
         let tf = UITextField()
         tf.placeholder = "Password"
         tf.translatesAutoresizingMaskIntoConstraints = false
+        tf.autocapitalizationType = .none
+        tf.isSecureTextEntry = true
         return tf
     }()
     
@@ -76,6 +83,7 @@ class LoginController: UIViewController {
         super.viewDidLoad()
         
         view.backgroundColor = UIColor(r: 61, g: 91, b: 151)
+        hideKeyboardWhenTappedAround()
         
         view.addSubview(inputContainerView)
         let inputContainerViewConstraints = [
@@ -153,5 +161,34 @@ class LoginController: UIViewController {
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
+    }
+    
+    @objc func handleRegister() {
+        guard let email = emailTextField.text, let password = passwordTextField.text, let name = nameTextField.text else {
+            return
+        }
+        Auth.auth().createUser(withEmail: email, password: password) { result, error in
+            if let error = error {
+                print(error.localizedDescription)
+                return
+            }
+            
+            guard let uid = result?.user.uid else {
+                return
+            }
+            
+            // Succes Register User
+            let ref = Database.database().reference(fromURL: "https://mychats-cad9d-default-rtdb.asia-southeast1.firebasedatabase.app")
+            let userParentRef = ref.child("users").child(uid)
+            let values = ["name": name, "email": email]
+            userParentRef.updateChildValues(values) { error, ref in
+                if let error = error {
+                    print(error.localizedDescription)
+                    return
+                }
+                
+                print("Saved user successfully into database")
+            }
+        }
     }
 }

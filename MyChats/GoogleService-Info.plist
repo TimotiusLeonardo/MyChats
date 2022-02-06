@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>718677086206-4469fv55ujb57gi5f02o1tc1m83ohg2r.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.718677086206-4469fv55ujb57gi5f02o1tc1m83ohg2r</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDaicXUjOyOogCrIz-NtS1kDIocpXj16bA</string>
+	<key>GCM_SENDER_ID</key>
+	<string>718677086206</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.TimotiusLeonardo.MyChats</string>
+	<key>PROJECT_ID</key>
+	<string>mychats-cad9d</string>
+	<key>STORAGE_BUCKET</key>
+	<string>mychats-cad9d.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:718677086206:ios:c14375b2c9d73d40a5baaf</string>
+	<key>DATABASE_URL</key>
+	<string>https://mychats-cad9d-default-rtdb.asia-southeast1.firebasedatabase.app</string>
+</dict>
+</plist>

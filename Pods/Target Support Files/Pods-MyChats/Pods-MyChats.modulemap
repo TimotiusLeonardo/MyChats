@@ -1,0 +1,6 @@
+framework module Pods_MyChats {
+  umbrella header "Pods-MyChats-umbrella.h"
+
+  export *
+  module * { export * }
+}
