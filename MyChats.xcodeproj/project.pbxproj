@@ -17,6 +17,8 @@
 		FF03307427AE95AF00624933 /* Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF03307327AE95AF00624933 /* Extension.swift */; };
 		FF03307A27AF87F000624933 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = FF03307927AF87EF00624933 /* GoogleService-Info.plist */; };
 		FF9F96F627B7A24100B92DC4 /* LoginController+handlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF9F96F527B7A24100B92DC4 /* LoginController+handlers.swift */; };
+		FFC3664527BCBBA7005E59D7 /* NewMessageTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC3664427BCBBA7005E59D7 /* NewMessageTableViewController.swift */; };
+		FFC3664827BCBFC4005E59D7 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC3664727BCBFC4005E59D7 /* User.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +36,8 @@
 		FF03307327AE95AF00624933 /* Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extension.swift; sourceTree = "<group>"; };
 		FF03307927AF87EF00624933 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		FF9F96F527B7A24100B92DC4 /* LoginController+handlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LoginController+handlers.swift"; sourceTree = "<group>"; };
+		FFC3664427BCBBA7005E59D7 /* NewMessageTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMessageTableViewController.swift; sourceTree = "<group>"; };
+		FFC3664727BCBFC4005E59D7 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,6 +90,7 @@
 		FF03305A27AE90D500624933 /* MyChats */ = {
 			isa = PBXGroup;
 			children = (
+				FFC3664627BCBFB5005E59D7 /* Models */,
 				FF03307227AE95A100624933 /* Config */,
 				FF03306F27AE94E900624933 /* Controller */,
 				FF03305B27AE90D500624933 /* AppDelegate.swift */,
@@ -104,6 +109,7 @@
 				FF03307027AE94FD00624933 /* LoginController.swift */,
 				FF03305F27AE90D500624933 /* ViewController.swift */,
 				FF9F96F527B7A24100B92DC4 /* LoginController+handlers.swift */,
+				FFC3664427BCBBA7005E59D7 /* NewMessageTableViewController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -114,6 +120,14 @@
 				FF03307327AE95AF00624933 /* Extension.swift */,
 			);
 			path = Config;
+			sourceTree = "<group>";
+		};
+		FFC3664627BCBFB5005E59D7 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				FFC3664727BCBFC4005E59D7 /* User.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -232,8 +246,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				FF03307427AE95AF00624933 /* Extension.swift in Sources */,
+				FFC3664527BCBBA7005E59D7 /* NewMessageTableViewController.swift in Sources */,
 				FF03306027AE90D500624933 /* ViewController.swift in Sources */,
 				FF9F96F627B7A24100B92DC4 /* LoginController+handlers.swift in Sources */,
+				FFC3664827BCBFC4005E59D7 /* User.swift in Sources */,
 				FF03307127AE94FD00624933 /* LoginController.swift in Sources */,
 				FF03305C27AE90D500624933 /* AppDelegate.swift in Sources */,
 				FF03305E27AE90D500624933 /* SceneDelegate.swift in Sources */,
