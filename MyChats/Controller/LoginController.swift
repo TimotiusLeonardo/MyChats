@@ -88,6 +88,14 @@ class LoginController: UIViewController {
         return sc
     }()
     
+    lazy var buttonActivityView: UIActivityIndicatorView = {
+        let view = UIActivityIndicatorView()
+        view.color = .white
+        view.style = .medium
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
     var inputsContainerViewHeightAnchor: NSLayoutConstraint?
     var nameTextFieldHeightAnchor: NSLayoutConstraint?
     var emailTextFieldHeightAnchor: NSLayoutConstraint?
@@ -177,6 +185,14 @@ class LoginController: UIViewController {
             loginRegisterSegmentedControl.heightAnchor.constraint(equalToConstant: 50)
         ]
         
+        view.addSubview(buttonActivityView)
+        let buttonActivityViewConstraints = [
+            buttonActivityView.centerXAnchor.constraint(equalTo: loginRegisterButton.centerXAnchor),
+            buttonActivityView.centerYAnchor.constraint(equalTo: loginRegisterButton.centerYAnchor),
+            buttonActivityView.widthAnchor.constraint(equalToConstant: 24),
+            buttonActivityView.heightAnchor.constraint(equalToConstant: 24)
+        ]
+        
         NSLayoutConstraint.activate(inputContainerViewConstraints)
         NSLayoutConstraint.activate(loginRegisterButtonConstraints)
         NSLayoutConstraint.activate(nameTextFieldConstraints)
@@ -186,6 +202,7 @@ class LoginController: UIViewController {
         NSLayoutConstraint.activate(passwordTextFieldConstraints)
         NSLayoutConstraint.activate(profileImageViewConstraints)
         NSLayoutConstraint.activate(segmentedControlConstraints)
+        NSLayoutConstraint.activate(buttonActivityViewConstraints)
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {

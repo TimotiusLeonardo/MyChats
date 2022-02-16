@@ -13,6 +13,7 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
     func handleLogin() {
         guard let email = emailTextField.text, let password = passwordTextField.text else {
             print("Form is not valid")
+            self.toggleLoadingButton(isLoading: false)
             return
         }
         
@@ -20,9 +21,10 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
                            password: password) { user, error in
             if error != nil {
                 print(error?.localizedDescription ?? "Error Sign in With Firebase")
+                self.toggleLoadingButton(isLoading: false)
                 return
             }
-            
+            self.toggleLoadingButton(isLoading: false)
             self.dismiss(animated: true, completion: nil)
         }
     }
@@ -34,10 +36,12 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
         Auth.auth().createUser(withEmail: email, password: password) { result, error in
             if let error = error {
                 print(error.localizedDescription)
+                self.toggleLoadingButton(isLoading: false)
                 return
             }
             
             guard let uid = result?.user.uid else {
+                self.toggleLoadingButton(isLoading: false)
                 return
             }
             // Succes Register User
@@ -47,6 +51,7 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
                 storageRef.putData(imageData, metadata: nil) { metadata, error in
                     if error != nil {
                         print(error?.localizedDescription ?? "error upload image")
+                        self.toggleLoadingButton(isLoading: false)
                         return
                     }
                     
@@ -55,6 +60,7 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
                             let values = ["name": name, "email": email, "profileImageUrl": unwrapUrl]
                             self.registerUserIntoDatabaseWithUID(uid: uid, values: values)
                         } else {
+                            self.toggleLoadingButton(isLoading: false)
                             print(error?.localizedDescription ?? "Error get download URL from firebase")
                         }
                     }
@@ -69,10 +75,23 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
         userParentRef.updateChildValues(values) { error, ref in
             if let error = error {
                 print(error.localizedDescription)
+                self.toggleLoadingButton(isLoading: false)
                 return
             }
-            
+            self.toggleLoadingButton(isLoading: false)
             self.dismiss(animated: true, completion: nil)
+        }
+    }
+    
+    func toggleLoadingButton(isLoading: Bool) {
+        if isLoading {
+            buttonActivityView.startAnimating()
+            loginRegisterButton.isEnabled = false
+            loginRegisterButton.setTitle("", for: .normal)
+        } else {
+            buttonActivityView.stopAnimating()
+            loginRegisterButton.isEnabled = true
+            handleSegmentValueChanged()
         }
     }
     
@@ -89,6 +108,7 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
     }
     
     @objc func handleLoginRegister() {
+        toggleLoadingButton(isLoading: true)
         if loginRegisterSegmentedControl.selectedSegmentIndex == 0 {
             handleLogin()
         } else {
