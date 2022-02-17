@@ -20,6 +20,7 @@
 		FFC3664527BCBBA7005E59D7 /* NewMessageTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC3664427BCBBA7005E59D7 /* NewMessageTableViewController.swift */; };
 		FFC3664827BCBFC4005E59D7 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC3664727BCBFC4005E59D7 /* User.swift */; };
 		FFC3664B27BE2ECB005E59D7 /* CustomImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC3664A27BE2ECB005E59D7 /* CustomImagePicker.swift */; };
+		FFC3664D27BE9E08005E59D7 /* ChatLogController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC3664C27BE9E08005E59D7 /* ChatLogController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +41,7 @@
 		FFC3664427BCBBA7005E59D7 /* NewMessageTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMessageTableViewController.swift; sourceTree = "<group>"; };
 		FFC3664727BCBFC4005E59D7 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		FFC3664A27BE2ECB005E59D7 /* CustomImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomImagePicker.swift; sourceTree = "<group>"; };
+		FFC3664C27BE9E08005E59D7 /* ChatLogController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatLogController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,6 +115,7 @@
 				FF03305F27AE90D500624933 /* ViewController.swift */,
 				FF9F96F527B7A24100B92DC4 /* LoginController+handlers.swift */,
 				FFC3664427BCBBA7005E59D7 /* NewMessageTableViewController.swift */,
+				FFC3664C27BE9E08005E59D7 /* ChatLogController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -256,6 +259,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FFC3664D27BE9E08005E59D7 /* ChatLogController.swift in Sources */,
 				FF03307427AE95AF00624933 /* Extension.swift in Sources */,
 				FFC3664527BCBBA7005E59D7 /* NewMessageTableViewController.swift in Sources */,
 				FF03306027AE90D500624933 /* ViewController.swift in Sources */,

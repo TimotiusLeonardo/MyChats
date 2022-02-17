@@ -53,9 +53,9 @@ class ViewController: UITableViewController {
     
     func setupNavBarWithUser(user: User) {
         let titleView = UIView()
-        titleView.frame = .init(x: 0, y: 0, width: 100, height: 40)
-        
-        
+        titleView.widthAnchor.constraint(equalToConstant: 200).isActive = true
+        titleView.heightAnchor.constraint(equalToConstant: 44).isActive = true
+        titleView.isUserInteractionEnabled = true
         
         let profileImageView = UIImageView()
         profileImageView.contentMode = .scaleAspectFill
@@ -66,7 +66,7 @@ class ViewController: UITableViewController {
             profileImageView.loadImageUsingCacheWithUrlString(urlString: profileImageUrl)
         }
         titleView.addSubview(profileImageView)
-        profileImageView.leftAnchor.constraint(equalTo: titleView.leftAnchor).isActive = true
+        profileImageView.centerXAnchor.constraint(equalTo: titleView.centerXAnchor, constant: -32).isActive = true
         profileImageView.centerYAnchor.constraint(equalTo: titleView.centerYAnchor).isActive = true
         profileImageView.widthAnchor.constraint(equalToConstant: 40).isActive = true
         profileImageView.heightAnchor.constraint(equalToConstant: 40).isActive = true
@@ -75,12 +75,21 @@ class ViewController: UITableViewController {
         nameLabel.text = user.name
         titleView.addSubview(nameLabel)
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
+        nameLabel.font = .systemFont(ofSize: 12, weight: .black)
         nameLabel.leftAnchor.constraint(equalTo: profileImageView.rightAnchor, constant: 8).isActive = true
         nameLabel.centerYAnchor.constraint(equalTo: profileImageView.centerYAnchor).isActive = true
         nameLabel.rightAnchor.constraint(equalTo: titleView.rightAnchor).isActive = true
         nameLabel.heightAnchor.constraint(equalTo: profileImageView.heightAnchor).isActive = true
         
         self.navigationItem.titleView = titleView
+        
+        titleView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(showChatController)))
+        
+    }
+    
+    @objc func showChatController() {
+        let chatLogController = ChatLogController(collectionViewLayout: UICollectionViewLayout())
+        navigationController?.pushViewController(chatLogController, animated: true)
     }
     
     @objc func handleLogout() {
