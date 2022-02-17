@@ -78,8 +78,16 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
                 self.toggleLoadingButton(isLoading: false)
                 return
             }
+            let user = User()
+            guard let name = values["name"] as? String, let email = values["email"] as? String else {
+                return
+            }
+            let profileImageUrl = values["profileImageUrl"] as? String
+            user.name = name
+            user.email = email
+            user.profileImageUrl = profileImageUrl
             self.toggleLoadingButton(isLoading: false)
-            self.messageController?.fetchUserAndSetupNavbarTitle()
+            self.messageController?.setupNavBarWithUser(user: user)
             self.dismiss(animated: true, completion: nil)
         }
     }
