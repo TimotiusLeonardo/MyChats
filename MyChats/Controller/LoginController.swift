@@ -96,7 +96,10 @@ class LoginController: UIViewController {
         return view
     }()
     
-    let picker = UIImagePickerController()
+    lazy var imagePicker: ImagePicker = {
+        let picker = ImagePicker(presentationController: self, delegate: self)
+        return picker
+    }()
     
     var inputsContainerViewHeightAnchor: NSLayoutConstraint?
     var nameTextFieldHeightAnchor: NSLayoutConstraint?

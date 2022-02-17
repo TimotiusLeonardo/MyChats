@@ -101,11 +101,7 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
     }
     
     @objc func handleSelectProfileImageView() {
-        let picker = UIImagePickerController()
-        picker.delegate = self
-        picker.allowsEditing = true
-        picker.mediaTypes = ["public.image"]
-        present(picker, animated: true, completion: nil)
+        imagePicker.present(from: view)
     }
     
     @objc func handleLoginRegister() {
@@ -160,5 +156,13 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
         }
         
         dismiss(animated: true, completion: nil)
+    }
+}
+
+extension LoginController: ImagePickerDelegate {
+    func didSelect(image: UIImage?) {
+        if let selectedImageFromPicker = image {
+            profileImageView.image = selectedImageFromPicker
+        }
     }
 }

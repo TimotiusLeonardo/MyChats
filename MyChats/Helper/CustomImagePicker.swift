@@ -35,9 +35,9 @@ open class ImagePicker: NSObject {
             return nil
         }
         
-        return UIAlertAction(title: title, style: .default) { [unowned self] _ in
-            self.pickerController.sourceType = type
-            self.presentationController?.present(self.pickerController, animated: true)
+        return UIAlertAction(title: title, style: .default) { [weak self] _ in
+            self?.pickerController.sourceType = type
+            self?.presentationController?.present(self?.pickerController ?? UIImagePickerController(), animated: true)
         }
     }
     
@@ -46,9 +46,6 @@ open class ImagePicker: NSObject {
         let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         if let action = self.action(for: .camera, title: "Take photo") {
-            alertController.addAction(action)
-        }
-        if let action = self.action(for: .savedPhotosAlbum, title: "Camera roll") {
             alertController.addAction(action)
         }
         if let action = self.action(for: .photoLibrary, title: "Photo library") {
