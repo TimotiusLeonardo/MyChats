@@ -9,7 +9,6 @@ import UIKit
 import Firebase
 
 extension LoginController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-    
     func handleLogin() {
         guard let email = emailTextField.text, let password = passwordTextField.text else {
             print("Form is not valid")
@@ -25,6 +24,7 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
                 return
             }
             self.toggleLoadingButton(isLoading: false)
+            self.messageController?.fetchUserAndSetupNavbarTitle()
             self.dismiss(animated: true, completion: nil)
         }
     }
@@ -47,7 +47,7 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
             // Succes Register User
             let imageName = NSUUID().uuidString
             let storageRef = Storage.storage().reference().child("profile_images").child("\(imageName).png")
-            if let imageData = self.profileImageView.image?.pngData() {
+            if let imageData = self.profileImageView.image?.jpegData(compressionQuality: 0.1) {
                 storageRef.putData(imageData, metadata: nil) { metadata, error in
                     if error != nil {
                         print(error?.localizedDescription ?? "error upload image")
@@ -79,6 +79,7 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
                 return
             }
             self.toggleLoadingButton(isLoading: false)
+            self.messageController?.fetchUserAndSetupNavbarTitle()
             self.dismiss(animated: true, completion: nil)
         }
     }
@@ -143,7 +144,6 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        print(info)
         var selectedImageFromPicker: UIImage?
         if let editedImage = info[UIImagePickerController.InfoKey(rawValue: "UIImagePickerControllerEditedImage")] as? UIImage {
             selectedImageFromPicker = editedImage

@@ -10,7 +10,6 @@ import Firebase
 import FirebaseDatabase
 
 class ViewController: UITableViewController {
-
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -23,12 +22,7 @@ class ViewController: UITableViewController {
         if Auth.auth().currentUser?.uid == nil {
             performSelector(onMainThread: #selector(handleLogout), with: nil, waitUntilDone: true)
         } else {
-            let uid = Auth.auth().currentUser?.uid
-            Database.database().reference().child("users").child(uid!).observeSingleEvent(of: .value) { snapshot in
-                if let dictionary = snapshot.value as? [String: AnyObject] {
-                    self.navigationItem.title = dictionary["name"] as? String
-                }
-            }
+            fetchUserAndSetupNavbarTitle()
         }
     }
     
@@ -36,6 +30,17 @@ class ViewController: UITableViewController {
         let newMessagecontroller = NewMessageTableViewController()
         let navController = UINavigationController(rootViewController: newMessagecontroller)
         present(navController, animated: true, completion: nil)
+    }
+    
+    func fetchUserAndSetupNavbarTitle() {
+        guard let uid = Auth.auth().currentUser?.uid else {
+            return
+        }
+        Database.database().reference().child("users").child(uid).observeSingleEvent(of: .value) { snapshot in
+            if let dictionary = snapshot.value as? [String: AnyObject] {
+                self.navigationItem.title = dictionary["name"] as? String
+            }
+        }
     }
     
     @objc func handleLogout() {
@@ -46,6 +51,7 @@ class ViewController: UITableViewController {
         }
         
         let loginVC = LoginController()
+        loginVC.messageController = self
         loginVC.modalPresentationStyle = .fullScreen
         present(loginVC, animated: true, completion: nil)
     }

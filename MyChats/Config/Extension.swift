@@ -31,6 +31,9 @@ extension UIViewController {
 
 extension UIImageView {
     func loadImageUsingCacheWithUrlString(urlString: String) {
+        
+        self.image = nil
+        
         guard let url = URL(string: urlString) else {
             return
         }
