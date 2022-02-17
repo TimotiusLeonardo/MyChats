@@ -19,6 +19,7 @@
 		FF9F96F627B7A24100B92DC4 /* LoginController+handlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF9F96F527B7A24100B92DC4 /* LoginController+handlers.swift */; };
 		FFC3664527BCBBA7005E59D7 /* NewMessageTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC3664427BCBBA7005E59D7 /* NewMessageTableViewController.swift */; };
 		FFC3664827BCBFC4005E59D7 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC3664727BCBFC4005E59D7 /* User.swift */; };
+		FFC3664B27BE2ECB005E59D7 /* CustomImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC3664A27BE2ECB005E59D7 /* CustomImagePicker.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +39,7 @@
 		FF9F96F527B7A24100B92DC4 /* LoginController+handlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LoginController+handlers.swift"; sourceTree = "<group>"; };
 		FFC3664427BCBBA7005E59D7 /* NewMessageTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMessageTableViewController.swift; sourceTree = "<group>"; };
 		FFC3664727BCBFC4005E59D7 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		FFC3664A27BE2ECB005E59D7 /* CustomImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomImagePicker.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,6 +92,7 @@
 		FF03305A27AE90D500624933 /* MyChats */ = {
 			isa = PBXGroup;
 			children = (
+				FFC3664927BE197C005E59D7 /* Helper */,
 				FFC3664627BCBFB5005E59D7 /* Models */,
 				FF03307227AE95A100624933 /* Config */,
 				FF03306F27AE94E900624933 /* Controller */,
@@ -128,6 +131,14 @@
 				FFC3664727BCBFC4005E59D7 /* User.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		FFC3664927BE197C005E59D7 /* Helper */ = {
+			isa = PBXGroup;
+			children = (
+				FFC3664A27BE2ECB005E59D7 /* CustomImagePicker.swift */,
+			);
+			path = Helper;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -253,6 +264,7 @@
 				FF03307127AE94FD00624933 /* LoginController.swift in Sources */,
 				FF03305C27AE90D500624933 /* AppDelegate.swift in Sources */,
 				FF03305E27AE90D500624933 /* SceneDelegate.swift in Sources */,
+				FFC3664B27BE2ECB005E59D7 /* CustomImagePicker.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -96,6 +96,8 @@ class LoginController: UIViewController {
         return view
     }()
     
+    let picker = UIImagePickerController()
+    
     var inputsContainerViewHeightAnchor: NSLayoutConstraint?
     var nameTextFieldHeightAnchor: NSLayoutConstraint?
     var emailTextFieldHeightAnchor: NSLayoutConstraint?

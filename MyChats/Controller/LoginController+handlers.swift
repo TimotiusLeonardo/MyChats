@@ -104,6 +104,7 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
         let picker = UIImagePickerController()
         picker.delegate = self
         picker.allowsEditing = true
+        picker.mediaTypes = ["public.image"]
         present(picker, animated: true, completion: nil)
     }
     

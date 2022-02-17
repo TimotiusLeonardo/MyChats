@@ -8,6 +8,8 @@
 import Foundation
 import UIKit
 
+let imageCache = NSCache<NSString, UIImage>()
+
 
 extension UIColor {
     convenience init(r: CGFloat, g: CGFloat, b: CGFloat) {
@@ -24,5 +26,37 @@ extension UIViewController {
     
     @objc func dismissKeyboard() {
         view.endEditing(true)
+    }
+}
+
+extension UIImageView {
+    func loadImageUsingCacheWithUrlString(urlString: String) {
+        guard let url = URL(string: urlString) else {
+            return
+        }
+        
+        // Check cache for image first
+        if let cachedImage = imageCache.object(forKey: NSString(string: urlString)) {
+            self.image = cachedImage
+            return
+        }
+        
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            
+            if error != nil {
+                print(error?.localizedDescription ?? "Error Getting Profile Image Data")
+                return
+            }
+            
+            DispatchQueue.main.async {
+                guard let data = data else {
+                    return
+                }
+                
+                self.image = UIImage(data: data)
+                
+                imageCache.setObject(UIImage(data: data) ?? UIImage(), forKey:  NSString(string: urlString))
+            }
+        }.resume()
     }
 }
