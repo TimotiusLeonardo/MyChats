@@ -21,6 +21,7 @@
 		FFC3664827BCBFC4005E59D7 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC3664727BCBFC4005E59D7 /* User.swift */; };
 		FFC3664B27BE2ECB005E59D7 /* CustomImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC3664A27BE2ECB005E59D7 /* CustomImagePicker.swift */; };
 		FFC3664D27BE9E08005E59D7 /* ChatLogController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC3664C27BE9E08005E59D7 /* ChatLogController.swift */; };
+		FFC3664F27BF35C1005E59D7 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC3664E27BF35C1005E59D7 /* Message.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,6 +43,7 @@
 		FFC3664727BCBFC4005E59D7 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		FFC3664A27BE2ECB005E59D7 /* CustomImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomImagePicker.swift; sourceTree = "<group>"; };
 		FFC3664C27BE9E08005E59D7 /* ChatLogController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatLogController.swift; sourceTree = "<group>"; };
+		FFC3664E27BF35C1005E59D7 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -132,6 +134,7 @@
 			isa = PBXGroup;
 			children = (
 				FFC3664727BCBFC4005E59D7 /* User.swift */,
+				FFC3664E27BF35C1005E59D7 /* Message.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -265,6 +268,7 @@
 				FF03306027AE90D500624933 /* ViewController.swift in Sources */,
 				FF9F96F627B7A24100B92DC4 /* LoginController+handlers.swift in Sources */,
 				FFC3664827BCBFC4005E59D7 /* User.swift in Sources */,
+				FFC3664F27BF35C1005E59D7 /* Message.swift in Sources */,
 				FF03307127AE94FD00624933 /* LoginController.swift in Sources */,
 				FF03305C27AE90D500624933 /* AppDelegate.swift in Sources */,
 				FF03305E27AE90D500624933 /* SceneDelegate.swift in Sources */,

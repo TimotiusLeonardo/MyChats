@@ -31,9 +31,11 @@ class NewMessageTableViewController: UITableViewController {
                     return
                 }
                 let profileImageUrl = dictionary["profileImageUrl"] as? String
+                let userId = snapshot.key
                 user.name = name
                 user.email = email
                 user.profileImageUrl = profileImageUrl
+                user.id = userId
                 self.users.append(user)
                 
                 DispatchQueue.main.async {
@@ -76,7 +78,7 @@ class NewMessageTableViewController: UITableViewController {
         tableView.deselectRow(at: indexPath, animated: true)
         dismiss(animated: true) {
             let user = self.users[indexPath.row]
-            self.messageController?.showChatController(user: user)
+            self.messageController?.redirectToChatController(user: user)
         }
     }
     

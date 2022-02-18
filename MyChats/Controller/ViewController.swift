@@ -10,12 +10,16 @@ import Firebase
 import FirebaseDatabase
 
 class ViewController: UITableViewController {
+    
+    var messages = [Message]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Logout", style: .plain, target: self, action: #selector(handleLogout))
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "square.and.pencil"), style: .plain, target: self, action: #selector(handleNewMessage))
         checkIfUserIsLoggedIn()
+        observeMessages()
     }
     
     private func checkIfUserIsLoggedIn() {
@@ -23,6 +27,30 @@ class ViewController: UITableViewController {
             performSelector(onMainThread: #selector(handleLogout), with: nil, waitUntilDone: true)
         } else {
             fetchUserAndSetupNavbarTitle()
+        }
+    }
+    
+    private func observeMessages() {
+        let ref = Database.database().reference().child("messages")
+        ref.observe(.childAdded) { snapshot in
+            if let dictionary = snapshot.value as? [String: AnyObject] {
+                let message = Message()
+                guard let text = dictionary["text"] as? String,
+                        let fromId = dictionary["fromId"] as? String,
+                        let timestamp = dictionary["timestamp"] as? TimeInterval,
+                        let toId = dictionary["toId"] as? String else {
+                    return
+                }
+                message.text = text
+                message.fromId = fromId
+                message.timestamp = timestamp
+                message.toId = toId
+                self.messages.append(message)
+                
+                DispatchQueue.main.async {
+                    self.tableView.reloadData()
+                }
+            }
         }
     }
     
@@ -85,12 +113,16 @@ class ViewController: UITableViewController {
         self.navigationItem.titleView = titleView
         
         titleView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(showChatController)))
-        
     }
     
-    @objc func showChatController(user: User?) {
+    func redirectToChatController(user: User?) {
         let chatLogController = ChatLogController(collectionViewLayout: UICollectionViewLayout())
         chatLogController.user = user
+        navigationController?.pushViewController(chatLogController, animated: true)
+    }
+    
+    @objc func showChatController() {
+        let chatLogController = ChatLogController(collectionViewLayout: UICollectionViewLayout())
         navigationController?.pushViewController(chatLogController, animated: true)
     }
     
@@ -106,6 +138,23 @@ class ViewController: UITableViewController {
         loginVC.modalPresentationStyle = .fullScreen
         present(loginVC, animated: true, completion: nil)
     }
-
+    
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+    
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        messages.count
+    }
+    
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "cellId")
+        let message = messages[indexPath.row]
+        
+        cell.textLabel?.text = message.text
+        cell.detailTextLabel?.text = message.toId
+        
+        return cell
+    }
 }
 

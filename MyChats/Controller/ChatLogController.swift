@@ -80,11 +80,20 @@ class ChatLogController: UICollectionViewController {
     @objc func handleSend() {
         let ref = Database.database().reference().child("messages")
         guard let text = inputTextField.text, !text.isEmpty else {
+            print("Input text is contain NO TEXT, please add some text to send to another user.")
             return
         }
         let childRef = ref.childByAutoId()
-        let values = [
-            "text": text
+        guard let toId = user?.id, let fromId = Auth.auth().currentUser?.uid else {
+            print("No User ID is found to send message")
+            return
+        }
+        let timestamp = Date().timeIntervalSince1970
+        let values: [String: Any] = [
+            "text": text,
+            "toId": toId,
+            "fromId": fromId,
+            "timestamp": timestamp
         ]
         childRef.updateChildValues(values) { [weak self] _, _ in
             self?.inputTextField.text = ""
