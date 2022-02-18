@@ -95,9 +95,26 @@ class ChatLogController: UICollectionViewController {
             "fromId": fromId,
             "timestamp": timestamp
         ]
-        childRef.updateChildValues(values) { _, _ in
-            self.inputTextField.text = ""
-            self.inputTextField.resignFirstResponder()
+        childRef.updateChildValues(values) { error, ref in
+            if error != nil {
+                print(error?.localizedDescription ?? "Error updating message to send")
+                return
+            }
+            let userMessagesRef = Database.database().reference().child("user-messages").child(fromId)
+            guard let messageId = childRef.key else {
+                return
+            }
+            let values: [String: Any] = [
+                messageId: 1
+            ]
+            userMessagesRef.updateChildValues(values) { error, _ in
+                if let error = error {
+                    print(error.localizedDescription)
+                    return
+                }
+                self.inputTextField.text = ""
+                self.inputTextField.resignFirstResponder()
+            }
         }
     }
     

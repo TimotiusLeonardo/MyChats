@@ -22,7 +22,8 @@ class ViewController: UITableViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "square.and.pencil"), style: .plain, target: self, action: #selector(handleNewMessage))
         tableView.register(UserCell.self, forCellReuseIdentifier: cellId)
         checkIfUserIsLoggedIn()
-        observeMessages()
+//        observeMessages()
+        observeUserMessages()
     }
     
     private func checkIfUserIsLoggedIn() {
@@ -30,6 +31,48 @@ class ViewController: UITableViewController {
             performSelector(onMainThread: #selector(handleLogout), with: nil, waitUntilDone: true)
         } else {
             fetchUserAndSetupNavbarTitle()
+        }
+    }
+    
+    private func observeUserMessages() {
+        guard let uid = Auth.auth().currentUser?.uid else {
+            return
+        }
+        let ref = Database.database().reference().child("user-messages").child(uid)
+        ref.observe(.childAdded) { snapshot in
+            let messageId = snapshot.key
+            let messageReference = Database.database().reference().child("messages").child(messageId)
+            
+            messageReference.observe(.value) { snapshot in
+                if let dictionary = snapshot.value as? [String: AnyObject] {
+                    let message = Message()
+                    guard let text = dictionary["text"] as? String,
+                          let fromId = dictionary["fromId"] as? String,
+                          let timestamp = dictionary["timestamp"] as? TimeInterval,
+                          let toId = dictionary["toId"] as? String else {
+                              return
+                          }
+                    message.text = text
+                    message.fromId = fromId
+                    message.timestamp = timestamp
+                    message.toId = toId
+                    
+                    if let toId = message.toId {
+                        self.messageDictionary[toId] = message
+                        self.messages = Array(self.messageDictionary.values)
+                        self.messages.sort { message1, message2 in
+                            return message1.timestamp ?? TimeInterval() > message2.timestamp ?? TimeInterval()
+                        }
+                    }
+                    
+                    DispatchQueue.main.async {
+                        self.tableView.reloadData()
+                    }
+                }
+            } withCancel: { error in
+                print(error.localizedDescription)
+            }
+
         }
     }
     
@@ -86,6 +129,7 @@ class ViewController: UITableViewController {
                 user.email = email
                 user.profileImageUrl = profileImageUrl
                 self.setupNavBarWithUser(user: user)
+                self.observeUserMessages()
             }
         }
     }
@@ -123,6 +167,13 @@ class ViewController: UITableViewController {
         self.navigationItem.titleView = titleView
         
         titleView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(showChatController)))
+        self.observeUserMessages()
+    }
+    
+    private func refreshTableViewToEmpty() {
+        messages.removeAll()
+        messageDictionary.removeAll()
+        tableView.reloadData()
     }
     
     func redirectToChatController(user: User?) {
@@ -146,6 +197,7 @@ class ViewController: UITableViewController {
         let loginVC = LoginController()
         loginVC.messageController = self
         loginVC.modalPresentationStyle = .fullScreen
+        refreshTableViewToEmpty()
         present(loginVC, animated: true, completion: nil)
     }
     
