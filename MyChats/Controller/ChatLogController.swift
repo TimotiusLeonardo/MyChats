@@ -95,8 +95,9 @@ class ChatLogController: UICollectionViewController {
             "fromId": fromId,
             "timestamp": timestamp
         ]
-        childRef.updateChildValues(values) { [weak self] _, _ in
-            self?.inputTextField.text = ""
+        childRef.updateChildValues(values) { _, _ in
+            self.inputTextField.text = ""
+            self.inputTextField.resignFirstResponder()
         }
     }
     
@@ -112,8 +113,6 @@ class ChatLogController: UICollectionViewController {
         if self.view.frame.origin.y != 0 {
             self.view.frame.origin.y = 0
         }
-        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
     }
 }
 

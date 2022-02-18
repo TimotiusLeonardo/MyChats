@@ -70,7 +70,7 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
     }
     
     private func registerUserIntoDatabaseWithUID(uid: String, values: [String: Any]) {
-        let ref = Database.database().reference(fromURL: "https://mychats-cad9d-default-rtdb.asia-southeast1.firebasedatabase.app")
+        let ref = Database.database().reference()
         let userParentRef = ref.child("users").child(uid)
         userParentRef.updateChildValues(values) { error, ref in
             if let error = error {

@@ -12,12 +12,15 @@ import FirebaseDatabase
 class ViewController: UITableViewController {
     
     var messages = [Message]()
+    let cellId = "cellId"
+    var messageDictionary = [String: Message]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Logout", style: .plain, target: self, action: #selector(handleLogout))
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "square.and.pencil"), style: .plain, target: self, action: #selector(handleNewMessage))
+        tableView.register(UserCell.self, forCellReuseIdentifier: cellId)
         checkIfUserIsLoggedIn()
         observeMessages()
     }
@@ -45,7 +48,14 @@ class ViewController: UITableViewController {
                 message.fromId = fromId
                 message.timestamp = timestamp
                 message.toId = toId
-                self.messages.append(message)
+                
+                if let toId = message.toId {
+                    self.messageDictionary[toId] = message
+                    self.messages = Array(self.messageDictionary.values)
+                    self.messages.sort { message1, message2 in
+                        return message1.timestamp ?? TimeInterval() > message2.timestamp ?? TimeInterval()
+                    }
+                }
                 
                 DispatchQueue.main.async {
                     self.tableView.reloadData()
@@ -143,18 +153,26 @@ class ViewController: UITableViewController {
         return 1
     }
     
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        72
+    }
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         messages.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "cellId")
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath) as? UserCell else {
+            return UITableViewCell()
+        }
         let message = messages[indexPath.row]
-        
-        cell.textLabel?.text = message.text
-        cell.detailTextLabel?.text = message.toId
+        cell.message = message
         
         return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
     }
 }
 
