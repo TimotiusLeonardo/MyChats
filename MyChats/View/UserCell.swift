@@ -12,18 +12,7 @@ class UserCell: UITableViewCell {
     
     var message: Message? {
         didSet {
-            if let toId = message?.toId {
-                let ref = Database.database().reference().child("users").child(toId)
-                ref.observeSingleEvent(of: .value, with: { snapshot in
-                    if let dictionary = snapshot.value as? [String: AnyObject] {
-                        self.textLabel?.text = dictionary["name"] as? String
-                        
-                        if let profileImageUrl = dictionary["profileImageUrl"] as? String {
-                            self.profileImageView.loadImageUsingCacheWithUrlString(urlString: profileImageUrl)
-                        }
-                    }
-                })
-            }
+            self.setupNameAndProfileImage()
             self.detailTextLabel?.text = message?.text
             self.timeLabel.text = self.formatDate(timeInterval: message?.timestamp)
         }
@@ -85,6 +74,29 @@ class UserCell: UITableViewCell {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func setupNameAndProfileImage() {
+        let chatPartnerId: String?
+        
+        if message?.fromId == Auth.auth().currentUser?.uid {
+            chatPartnerId = message?.toId
+        } else {
+            chatPartnerId = message?.fromId
+        }
+        
+        if let toId = chatPartnerId {
+            let ref = Database.database().reference().child("users").child(toId)
+            ref.observeSingleEvent(of: .value, with: { snapshot in
+                if let dictionary = snapshot.value as? [String: AnyObject] {
+                    self.textLabel?.text = dictionary["name"] as? String
+                    
+                    if let profileImageUrl = dictionary["profileImageUrl"] as? String {
+                        self.profileImageView.loadImageUsingCacheWithUrlString(urlString: profileImageUrl)
+                    }
+                }
+            })
+        }
     }
     
     private func formatDate(timeInterval: TimeInterval?) -> String {

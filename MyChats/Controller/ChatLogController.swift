@@ -112,6 +112,10 @@ class ChatLogController: UICollectionViewController {
                     print(error.localizedDescription)
                     return
                 }
+                
+                let recipientUserMessagesRef = Database.database().reference().child("user-messages").child(toId)
+                recipientUserMessagesRef.updateChildValues([messageId: 1])
+                
                 self.inputTextField.text = ""
                 self.inputTextField.resignFirstResponder()
             }
