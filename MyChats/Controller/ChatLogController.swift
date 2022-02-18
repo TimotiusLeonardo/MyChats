@@ -10,6 +10,12 @@ import Firebase
 
 class ChatLogController: UICollectionViewController {
     
+    var user: User? {
+        didSet {
+            navigationItem.title = user?.name
+        }
+    }
+    
     lazy var inputTextField: UITextField = {
         let inputTextField = UITextField()
         inputTextField.placeholder = "Enter message..."
@@ -22,7 +28,6 @@ class ChatLogController: UICollectionViewController {
         super.viewDidLoad()
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
-        navigationItem.title = "Chat Log"
         hideKeyboardWhenTappedAround()
         setupInputComponents()
     }
