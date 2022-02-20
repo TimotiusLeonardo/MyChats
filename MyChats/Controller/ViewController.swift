@@ -42,7 +42,7 @@ class ViewController: UITableViewController {
             let messageId = snapshot.key
             let messageReference = Database.database().reference().child("messages").child(messageId)
             
-            messageReference.observe(.value) { snapshot in
+            messageReference.observeSingleEvent(of: .value) { snapshot in
                 if let dictionary = snapshot.value as? [String: AnyObject] {
                     let message = Message()
                     guard let text = dictionary["text"] as? String,
@@ -56,8 +56,8 @@ class ViewController: UITableViewController {
                     message.timestamp = timestamp
                     message.toId = toId
                     
-                    if let toId = message.toId {
-                        self.messageDictionary[toId] = message
+                    if let chatPartnerId = message.chatPartnerId() {
+                        self.messageDictionary[chatPartnerId] = message
                         self.messages = Array(self.messageDictionary.values)
                         self.messages.sort { message1, message2 in
                             return message1.timestamp ?? TimeInterval() > message2.timestamp ?? TimeInterval()
@@ -190,8 +190,8 @@ class ViewController: UITableViewController {
             return UITableViewCell()
         }
         let message = messages[indexPath.row]
-        cell.message = message
-        
+        cell.configureCell(message: message)
+        cell.layoutIfNeeded()
         return cell
     }
     

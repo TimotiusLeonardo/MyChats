@@ -8,7 +8,7 @@
 import UIKit
 import Firebase
 
-class ChatLogController: UICollectionViewController {
+class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
     var user: User? {
         didSet {
@@ -31,8 +31,9 @@ class ChatLogController: UICollectionViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
         collectionView.register(ChatMessageCell.self, forCellWithReuseIdentifier: cellId)
-        collectionView.collectionViewLayout = collectionViewLayout
         collectionView.alwaysBounceVertical = true
+        collectionView.contentInset = .init(top: 8, left: 0, bottom: 108, right: 0)
+        collectionView.scrollIndicatorInsets = .init(top: 0, left: 0, bottom: 100, right: 0)
         hideKeyboardWhenTappedAround()
         setupInputComponents()
     }
@@ -40,6 +41,11 @@ class ChatLogController: UICollectionViewController {
     override func viewWillDisappear(_ animated: Bool) {
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    /// For changing traits
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        collectionView.collectionViewLayout.invalidateLayout()
     }
     
     func setupInputComponents() {
@@ -79,6 +85,13 @@ class ChatLogController: UICollectionViewController {
         separatorLineView.topAnchor.constraint(equalTo: containerView.topAnchor).isActive = true
         separatorLineView.widthAnchor.constraint(equalTo: containerView.widthAnchor).isActive = true
         separatorLineView.heightAnchor.constraint(equalToConstant: 1).isActive = true
+    }
+    
+    private func estimateFrameForText(text: String) -> CGRect {
+        let size = CGSize(width: 200, height: 1000)
+        let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
+        
+        return NSString(string: text).boundingRect(with: size, options: options, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16, weight: .regular)], context: nil)
     }
     
     private func observeMessages() {
@@ -155,7 +168,7 @@ class ChatLogController: UICollectionViewController {
                 let recipientUserMessagesRef = Database.database().reference().child("user-messages").child(toId)
                 recipientUserMessagesRef.updateChildValues([messageId: 1])
                 
-                self.inputTextField.text = ""
+                self.inputTextField.text = nil
                 self.inputTextField.resignFirstResponder()
             }
         }
@@ -186,8 +199,21 @@ class ChatLogController: UICollectionViewController {
         
         let message = messages[indexPath.row]
         cell.textView.text = message.text
+        guard let text = message.text else {
+            return cell
+        }
         
+        cell.bubbleWidthAnchor?.constant = estimateFrameForText(text: text).width + 32
         return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        var height: CGFloat = 80
+        // get estimated height
+        if let text = messages[indexPath.item].text {
+            height = estimateFrameForText(text: text).height + 20
+        }
+        return .init(width: view.frame.width, height: height)
     }
 }
 

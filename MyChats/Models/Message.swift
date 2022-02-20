@@ -13,6 +13,7 @@ class Message: NSObject {
     var text: String?
     var timestamp: TimeInterval?
     var toId: String?
+    var chatPartnerName: String?
     
     func chatPartnerId() -> String? {
         return fromId == Auth.auth().currentUser?.uid ? toId : fromId

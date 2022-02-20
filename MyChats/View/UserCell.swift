@@ -12,7 +12,8 @@ class UserCell: UITableViewCell {
     
     var message: Message? {
         didSet {
-            self.setupNameAndProfileImage()
+            refreshLabel()
+            self.textLabel?.text = message?.chatPartnerName
             self.detailTextLabel?.text = message?.text
             self.timeLabel.text = self.formatDate(timeInterval: message?.timestamp)
         }
@@ -76,19 +77,36 @@ class UserCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func configureCell(message: Message?) {
+        guard let message = message else {
+            return
+        }
+        
+        self.message = message
+        self.setupNameAndProfileImage()
+    }
+    
     private func setupNameAndProfileImage() {
         if let toId = message?.chatPartnerId() {
             let ref = Database.database().reference().child("users").child(toId)
             ref.observeSingleEvent(of: .value, with: { snapshot in
                 if let dictionary = snapshot.value as? [String: AnyObject] {
-                    self.textLabel?.text = dictionary["name"] as? String
+                    let newMessageModel = self.message
+                    newMessageModel?.chatPartnerName = dictionary["name"] as? String
                     
                     if let profileImageUrl = dictionary["profileImageUrl"] as? String {
                         self.profileImageView.loadImageUsingCacheWithUrlString(urlString: profileImageUrl)
                     }
+                    
+                    self.message = newMessageModel
                 }
             })
         }
+    }
+    
+    private func refreshLabel() {
+        textLabel?.text = nil
+        detailTextLabel?.text = nil
     }
     
     private func formatDate(timeInterval: TimeInterval?) -> String {
