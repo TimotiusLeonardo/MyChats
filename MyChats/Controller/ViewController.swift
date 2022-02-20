@@ -63,15 +63,24 @@ class ViewController: UITableViewController {
                             return message1.timestamp ?? TimeInterval() > message2.timestamp ?? TimeInterval()
                         }
                     }
-                    
-                    DispatchQueue.main.async {
-                        self.tableView.reloadData()
-                    }
+                    self.timer?.invalidate()
+                    print("canceled timer")
+                    self.timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.handleReloadTable), userInfo: nil, repeats: false)
+                    print("schedule a table reload in 0.1 sec")
                 }
             } withCancel: { error in
                 print(error.localizedDescription)
             }
 
+        }
+    }
+    
+    var timer: Timer?
+    
+    @objc func handleReloadTable() {
+        DispatchQueue.main.async {
+            print("we reloaded the table")
+            self.tableView.reloadData()
         }
     }
     
