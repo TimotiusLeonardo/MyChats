@@ -22,7 +22,6 @@ class ViewController: UITableViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "square.and.pencil"), style: .plain, target: self, action: #selector(handleNewMessage))
         tableView.register(UserCell.self, forCellReuseIdentifier: cellId)
         checkIfUserIsLoggedIn()
-//        observeMessages()
         observeUserMessages()
     }
     
@@ -73,37 +72,6 @@ class ViewController: UITableViewController {
                 print(error.localizedDescription)
             }
 
-        }
-    }
-    
-    private func observeMessages() {
-        let ref = Database.database().reference().child("messages")
-        ref.observe(.childAdded) { snapshot in
-            if let dictionary = snapshot.value as? [String: AnyObject] {
-                let message = Message()
-                guard let text = dictionary["text"] as? String,
-                        let fromId = dictionary["fromId"] as? String,
-                        let timestamp = dictionary["timestamp"] as? TimeInterval,
-                        let toId = dictionary["toId"] as? String else {
-                    return
-                }
-                message.text = text
-                message.fromId = fromId
-                message.timestamp = timestamp
-                message.toId = toId
-                
-                if let toId = message.toId {
-                    self.messageDictionary[toId] = message
-                    self.messages = Array(self.messageDictionary.values)
-                    self.messages.sort { message1, message2 in
-                        return message1.timestamp ?? TimeInterval() > message2.timestamp ?? TimeInterval()
-                    }
-                }
-                
-                DispatchQueue.main.async {
-                    self.tableView.reloadData()
-                }
-            }
         }
     }
     
@@ -177,13 +145,17 @@ class ViewController: UITableViewController {
     }
     
     func redirectToChatController(user: User?) {
-        let chatLogController = ChatLogController(collectionViewLayout: UICollectionViewLayout())
+        let collectionViewLayout = UICollectionViewFlowLayout()
+        collectionViewLayout.itemSize = .init(width: view.frame.width, height: 80)
+        let chatLogController = ChatLogController(collectionViewLayout: collectionViewLayout)
         chatLogController.user = user
         navigationController?.pushViewController(chatLogController, animated: true)
     }
     
     @objc func showChatController() {
-        let chatLogController = ChatLogController(collectionViewLayout: UICollectionViewLayout())
+        let collectionViewLayout = UICollectionViewFlowLayout()
+        collectionViewLayout.itemSize = .init(width: view.frame.width, height: 80)
+        let chatLogController = ChatLogController(collectionViewLayout: collectionViewLayout)
         navigationController?.pushViewController(chatLogController, animated: true)
     }
     
@@ -225,6 +197,29 @@ class ViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        let message = messages[indexPath.row]
+        guard let chatPartnerId = message.chatPartnerId() else {
+            return
+        }
+        
+        let ref = Database.database().reference().child("users").child(chatPartnerId)
+        ref.observeSingleEvent(of: .value) { snapshot in
+            guard let dictionary = snapshot.value as? [String: AnyObject] else {
+                return
+            }
+            
+            let user = User()
+            guard let name = dictionary["name"] as? String, let email = dictionary["email"] as? String else {
+                return
+            }
+            let profileImageUrl = dictionary["profileImageUrl"] as? String
+            user.name = name
+            user.email = email
+            user.profileImageUrl = profileImageUrl
+            user.id = chatPartnerId
+            self.redirectToChatController(user: user)
+        }
+        
     }
 }
 

@@ -13,9 +13,11 @@ class ChatLogController: UICollectionViewController {
     var user: User? {
         didSet {
             navigationItem.title = user?.name
+            observeMessages()
         }
     }
-    
+    var cellId = "cellId"
+    var messages = [Message]()
     lazy var inputTextField: UITextField = {
         let inputTextField = UITextField()
         inputTextField.placeholder = "Enter message..."
@@ -28,6 +30,9 @@ class ChatLogController: UICollectionViewController {
         super.viewDidLoad()
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+        collectionView.register(ChatMessageCell.self, forCellWithReuseIdentifier: cellId)
+        collectionView.collectionViewLayout = collectionViewLayout
+        collectionView.alwaysBounceVertical = true
         hideKeyboardWhenTappedAround()
         setupInputComponents()
     }
@@ -40,13 +45,13 @@ class ChatLogController: UICollectionViewController {
     func setupInputComponents() {
         let containerView = UIView()
         containerView.translatesAutoresizingMaskIntoConstraints = false
-        
+        containerView.backgroundColor = .white
         view.addSubview(containerView)
         
         containerView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
-        containerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+        containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         containerView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
-        containerView.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        containerView.heightAnchor.constraint(equalToConstant: 100).isActive = true
         
         let sendButton = UIButton(type: .system)
         sendButton.translatesAutoresizingMaskIntoConstraints = false
@@ -55,16 +60,15 @@ class ChatLogController: UICollectionViewController {
         containerView.addSubview(sendButton)
         
         sendButton.rightAnchor.constraint(equalTo: containerView.rightAnchor).isActive = true
-        sendButton.centerYAnchor.constraint(equalTo: containerView.centerYAnchor).isActive = true
+        sendButton.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 24).isActive = true
         sendButton.widthAnchor.constraint(equalToConstant: 80).isActive = true
-        sendButton.heightAnchor.constraint(equalTo: containerView.heightAnchor).isActive = true
         
         containerView.addSubview(inputTextField)
         
         inputTextField.leftAnchor.constraint(equalTo: containerView.leftAnchor, constant: 24).isActive = true
-        inputTextField.centerYAnchor.constraint(equalTo: containerView.centerYAnchor).isActive = true
+        inputTextField.centerYAnchor.constraint(equalTo: sendButton.centerYAnchor).isActive = true
         inputTextField.rightAnchor.constraint(equalTo: sendButton.leftAnchor).isActive = true
-        inputTextField.heightAnchor.constraint(equalTo: containerView.heightAnchor).isActive = true
+        inputTextField.heightAnchor.constraint(equalTo: containerView.heightAnchor, multiplier: 0.5).isActive = true
         
         let separatorLineView = UIView()
         separatorLineView.backgroundColor = UIColor(r: 220, g: 220, b: 220)
@@ -75,6 +79,41 @@ class ChatLogController: UICollectionViewController {
         separatorLineView.topAnchor.constraint(equalTo: containerView.topAnchor).isActive = true
         separatorLineView.widthAnchor.constraint(equalTo: containerView.widthAnchor).isActive = true
         separatorLineView.heightAnchor.constraint(equalToConstant: 1).isActive = true
+    }
+    
+    private func observeMessages() {
+        guard let uid = Auth.auth().currentUser?.uid else {
+            return
+        }
+        
+        let userMessagesRef = Database.database().reference().child("user-messages").child(uid)
+        userMessagesRef.observe(.childAdded) { snapshot in
+            let messageId = snapshot.key
+            let messageref = Database.database().reference().child("messages").child(messageId)
+            messageref.observeSingleEvent(of: .value) { snapshot in
+                guard let dictionary = snapshot.value as? [String: Any] else {
+                    return
+                }
+                
+                let message = Message()
+                guard let text = dictionary["text"] as? String,
+                      let fromId = dictionary["fromId"] as? String,
+                      let timestamp = dictionary["timestamp"] as? TimeInterval,
+                      let toId = dictionary["toId"] as? String else {
+                          return
+                      }
+                message.text = text
+                message.fromId = fromId
+                message.timestamp = timestamp
+                message.toId = toId
+                if message.chatPartnerId() == self.user?.id {
+                    self.messages.append(message)
+                    DispatchQueue.main.async {
+                        self.collectionView.reloadData()
+                    }
+                }
+            }
+        }
     }
     
     @objc func handleSend() {
@@ -134,6 +173,21 @@ class ChatLogController: UICollectionViewController {
         if self.view.frame.origin.y != 0 {
             self.view.frame.origin.y = 0
         }
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return messages.count
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as? ChatMessageCell else {
+            return UICollectionViewCell()
+        }
+        
+        let message = messages[indexPath.row]
+        cell.textView.text = message.text
+        
+        return cell
     }
 }
 

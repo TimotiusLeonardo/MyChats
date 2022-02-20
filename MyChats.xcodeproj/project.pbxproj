@@ -23,6 +23,7 @@
 		FFC3664D27BE9E08005E59D7 /* ChatLogController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC3664C27BE9E08005E59D7 /* ChatLogController.swift */; };
 		FFC3664F27BF35C1005E59D7 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC3664E27BF35C1005E59D7 /* Message.swift */; };
 		FFC3665227BF473D005E59D7 /* UserCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC3665127BF473D005E59D7 /* UserCell.swift */; };
+		FFC776F227C21E47003FFC9E /* ChatMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC776F127C21E47003FFC9E /* ChatMessageCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +47,7 @@
 		FFC3664C27BE9E08005E59D7 /* ChatLogController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatLogController.swift; sourceTree = "<group>"; };
 		FFC3664E27BF35C1005E59D7 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		FFC3665127BF473D005E59D7 /* UserCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCell.swift; sourceTree = "<group>"; };
+		FFC776F127C21E47003FFC9E /* ChatMessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessageCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -154,6 +156,7 @@
 			isa = PBXGroup;
 			children = (
 				FFC3665127BF473D005E59D7 /* UserCell.swift */,
+				FFC776F127C21E47003FFC9E /* ChatMessageCell.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -278,6 +281,7 @@
 				FFC3664527BCBBA7005E59D7 /* NewMessageTableViewController.swift in Sources */,
 				FF03306027AE90D500624933 /* ViewController.swift in Sources */,
 				FF9F96F627B7A24100B92DC4 /* LoginController+handlers.swift in Sources */,
+				FFC776F227C21E47003FFC9E /* ChatMessageCell.swift in Sources */,
 				FFC3664827BCBFC4005E59D7 /* User.swift in Sources */,
 				FFC3664F27BF35C1005E59D7 /* Message.swift in Sources */,
 				FF03307127AE94FD00624933 /* LoginController.swift in Sources */,
