@@ -199,12 +199,34 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
         
         let message = messages[indexPath.row]
         cell.textView.text = message.text
+        setupCell(cell: cell, message: message)
         guard let text = message.text else {
             return cell
         }
         
         cell.bubbleWidthAnchor?.constant = estimateFrameForText(text: text).width + 32
         return cell
+    }
+    
+    private func setupCell(cell: ChatMessageCell, message: Message) {
+        if let profileImageUrl = self.user?.profileImageUrl {
+            cell.profileImageView.loadImageUsingCacheWithUrlString(urlString: profileImageUrl)
+        }
+        if message.fromId == Auth.auth().currentUser?.uid {
+            // outcoming message
+            cell.bubbleView.backgroundColor = ChatMessageCell.blueColor
+            cell.textView.textColor = .white
+            cell.profileImageView.isHidden = true
+            cell.bubbleViewRightAnchor?.isActive = true
+            cell.bubbleViewLeftAnchor?.isActive = false
+        } else {
+            // incoming message
+            cell.bubbleView.backgroundColor = .init(r: 240, g: 240, b: 240)
+            cell.textView.textColor = .black
+            cell.profileImageView.isHidden = false
+            cell.bubbleViewRightAnchor?.isActive = false
+            cell.bubbleViewLeftAnchor?.isActive = true
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
