@@ -18,6 +18,7 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
     }
     var cellId = "cellId"
     var messages = [Message]()
+    var bottomContainerViewBottomConstraints: NSLayoutConstraint?
     lazy var inputTextField: UITextField = {
         let inputTextField = UITextField()
         inputTextField.placeholder = "Enter message..."
@@ -36,6 +37,7 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
         collectionView.scrollIndicatorInsets = .init(top: 0, left: 0, bottom: 100, right: 0)
         hideKeyboardWhenTappedAround()
         setupInputComponents()
+        setupKeyboardObservers()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -48,16 +50,21 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
         collectionView.collectionViewLayout.invalidateLayout()
     }
     
+    private func setupKeyboardObservers() {
+        
+    }
+    
     func setupInputComponents() {
         let containerView = UIView()
         containerView.translatesAutoresizingMaskIntoConstraints = false
         containerView.backgroundColor = .white
         view.addSubview(containerView)
         
+        bottomContainerViewBottomConstraints = containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         containerView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
-        containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         containerView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
         containerView.heightAnchor.constraint(equalToConstant: 100).isActive = true
+        bottomContainerViewBottomConstraints?.isActive = true
         
         let sendButton = UIButton(type: .system)
         sendButton.translatesAutoresizingMaskIntoConstraints = false
@@ -175,16 +182,33 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
     }
     
     @objc func keyboardWillShow(notification: NSNotification) {
-        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
-            if self.view.frame.origin.y == 0 {
-                self.view.frame.origin.y -= keyboardSize.height
+        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
+        let keyboardDuration = (notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue {
+            if bottomContainerViewBottomConstraints?.constant == 0 {
+                bottomContainerViewBottomConstraints?.constant -= keyboardSize.height - 28
+                
+                UIView.animate(withDuration: keyboardDuration,
+                               delay: 0,
+                               options: .curveEaseInOut,
+                               animations: {
+                    self.view.layoutIfNeeded()
+                }, completion: nil)
             }
         }
     }
     
     @objc func keyboardWillHide(notification: NSNotification) {
-        if self.view.frame.origin.y != 0 {
-            self.view.frame.origin.y = 0
+        if let keyboardDuration = (notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue {
+            if bottomContainerViewBottomConstraints?.constant != 0 {
+                bottomContainerViewBottomConstraints?.constant = 0
+                
+                UIView.animate(withDuration: keyboardDuration,
+                               delay: 0,
+                               options: .curveEaseInOut,
+                               animations: {
+                    self.view.layoutIfNeeded()
+                }, completion: nil)
+            }
         }
     }
     
