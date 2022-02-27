@@ -74,18 +74,11 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
     
     override func viewDidLoad() {
         super.viewDidLoad()
-//        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
-//        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
         collectionView.register(ChatMessageCell.self, forCellWithReuseIdentifier: cellId)
         collectionView.alwaysBounceVertical = true
         collectionView.contentInset = .init(top: 8, left: 0, bottom: 8, right: 0)
         collectionView.keyboardDismissMode = .interactive
         hideKeyboardWhenTappedAround()
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     
     /// For changing traits
@@ -101,11 +94,11 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
     }
     
     private func observeMessages() {
-        guard let uid = Auth.auth().currentUser?.uid else {
+        guard let uid = Auth.auth().currentUser?.uid, let toId = user?.id else {
             return
         }
         
-        let userMessagesRef = Database.database().reference().child("user-messages").child(uid)
+        let userMessagesRef = Database.database().reference().child("user-messages").child(uid).child(toId)
         userMessagesRef.observe(.childAdded) { snapshot in
             let messageId = snapshot.key
             let messageref = Database.database().reference().child("messages").child(messageId)
@@ -125,11 +118,10 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
                 message.fromId = fromId
                 message.timestamp = timestamp
                 message.toId = toId
-                if message.chatPartnerId() == self.user?.id {
-                    self.messages.append(message)
-                    DispatchQueue.main.async {
-                        self.collectionView.reloadData()
-                    }
+                
+                self.messages.append(message)
+                DispatchQueue.main.async {
+                    self.collectionView.reloadData()
                 }
             }
         }
@@ -158,7 +150,7 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
                 print(error?.localizedDescription ?? "Error updating message to send")
                 return
             }
-            let userMessagesRef = Database.database().reference().child("user-messages").child(fromId)
+            let userMessagesRef = Database.database().reference().child("user-messages").child(fromId).child(toId)
             guard let messageId = childRef.key else {
                 return
             }
@@ -171,42 +163,11 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
                     return
                 }
                 
-                let recipientUserMessagesRef = Database.database().reference().child("user-messages").child(toId)
+                let recipientUserMessagesRef = Database.database().reference().child("user-messages").child(toId).child(fromId)
                 recipientUserMessagesRef.updateChildValues([messageId: 1])
                 
                 self.inputTextField.text = nil
                 self.inputTextField.resignFirstResponder()
-            }
-        }
-    }
-    
-    @objc func keyboardWillShow(notification: NSNotification) {
-        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
-        let keyboardDuration = (notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue {
-            if bottomContainerViewBottomConstraints?.constant == 0 {
-                bottomContainerViewBottomConstraints?.constant -= keyboardSize.height - 28
-                
-                UIView.animate(withDuration: keyboardDuration,
-                               delay: 0,
-                               options: .curveEaseInOut,
-                               animations: {
-                    self.view.layoutIfNeeded()
-                }, completion: nil)
-            }
-        }
-    }
-    
-    @objc func keyboardWillHide(notification: NSNotification) {
-        if let keyboardDuration = (notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue {
-            if bottomContainerViewBottomConstraints?.constant != 0 {
-                bottomContainerViewBottomConstraints?.constant = 0
-                
-                UIView.animate(withDuration: keyboardDuration,
-                               delay: 0,
-                               options: .curveEaseInOut,
-                               animations: {
-                    self.view.layoutIfNeeded()
-                }, completion: nil)
             }
         }
     }
