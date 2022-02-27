@@ -27,44 +27,10 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
         return inputTextField
     }()
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
-        collectionView.register(ChatMessageCell.self, forCellWithReuseIdentifier: cellId)
-        collectionView.alwaysBounceVertical = true
-        collectionView.contentInset = .init(top: 8, left: 0, bottom: 108, right: 0)
-        collectionView.scrollIndicatorInsets = .init(top: 0, left: 0, bottom: 100, right: 0)
-        hideKeyboardWhenTappedAround()
-        setupInputComponents()
-        setupKeyboardObservers()
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
-    }
-    
-    /// For changing traits
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        collectionView.collectionViewLayout.invalidateLayout()
-    }
-    
-    private func setupKeyboardObservers() {
-        
-    }
-    
-    func setupInputComponents() {
+    lazy var inputContainerView: UIView = {
         let containerView = UIView()
-        containerView.translatesAutoresizingMaskIntoConstraints = false
+        containerView.frame = .init(x: 0, y: 0, width: view.frame.width, height: 80)
         containerView.backgroundColor = .white
-        view.addSubview(containerView)
-        
-        bottomContainerViewBottomConstraints = containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        containerView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
-        containerView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
-        containerView.heightAnchor.constraint(equalToConstant: 100).isActive = true
-        bottomContainerViewBottomConstraints?.isActive = true
         
         let sendButton = UIButton(type: .system)
         sendButton.translatesAutoresizingMaskIntoConstraints = false
@@ -73,7 +39,7 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
         containerView.addSubview(sendButton)
         
         sendButton.rightAnchor.constraint(equalTo: containerView.rightAnchor).isActive = true
-        sendButton.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 24).isActive = true
+        sendButton.centerYAnchor.constraint(equalTo: containerView.centerYAnchor).isActive = true
         sendButton.widthAnchor.constraint(equalToConstant: 80).isActive = true
         
         containerView.addSubview(inputTextField)
@@ -92,6 +58,39 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
         separatorLineView.topAnchor.constraint(equalTo: containerView.topAnchor).isActive = true
         separatorLineView.widthAnchor.constraint(equalTo: containerView.widthAnchor).isActive = true
         separatorLineView.heightAnchor.constraint(equalToConstant: 1).isActive = true
+        
+        return containerView
+    }()
+    
+    override var inputAccessoryView: UIView? {
+        get {
+            return inputContainerView
+        }
+    }
+    
+    override var canBecomeFirstResponder: Bool {
+        return true
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+//        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+        collectionView.register(ChatMessageCell.self, forCellWithReuseIdentifier: cellId)
+        collectionView.alwaysBounceVertical = true
+        collectionView.contentInset = .init(top: 8, left: 0, bottom: 8, right: 0)
+        collectionView.keyboardDismissMode = .interactive
+        hideKeyboardWhenTappedAround()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    /// For changing traits
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        collectionView.collectionViewLayout.invalidateLayout()
     }
     
     private func estimateFrameForText(text: String) -> CGRect {
@@ -259,7 +258,10 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
         if let text = messages[indexPath.item].text {
             height = estimateFrameForText(text: text).height + 20
         }
-        return .init(width: view.frame.width, height: height)
+        
+        let width = UIScreen.main.bounds.width
+        
+        return .init(width: width, height: height)
     }
 }
 
