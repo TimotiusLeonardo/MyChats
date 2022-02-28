@@ -38,6 +38,15 @@ class ChatMessageCell: UICollectionViewCell {
         return imageView
     }()
     
+    lazy var messageImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.contentMode = .scaleAspectFill
+        imageView.layer.cornerRadius = 16
+        imageView.layer.masksToBounds = true
+        return imageView
+    }()
+    
     var bubbleWidthAnchor: NSLayoutConstraint?
     var bubbleViewRightAnchor: NSLayoutConstraint?
     var bubbleViewLeftAnchor: NSLayoutConstraint?
@@ -49,6 +58,7 @@ class ChatMessageCell: UICollectionViewCell {
         addSubview(bubbleView)
         addSubview(textView)
         addSubview(profileImageView)
+        bubbleView.addSubview(messageImageView)
         
         bubbleWidthAnchor = bubbleView.widthAnchor.constraint(equalToConstant: 200)
         bubbleViewRightAnchor = bubbleView.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -8)
@@ -74,9 +84,17 @@ class ChatMessageCell: UICollectionViewCell {
             profileImageView.heightAnchor.constraint(equalToConstant: 32)
         ]
         
+        let messageImageViewConstraints = [
+            messageImageView.topAnchor.constraint(equalTo: bubbleView.topAnchor),
+            messageImageView.leftAnchor.constraint(equalTo: bubbleView.leftAnchor),
+            messageImageView.widthAnchor.constraint(equalTo: bubbleView.widthAnchor),
+            messageImageView.heightAnchor.constraint(equalTo: bubbleView.heightAnchor)
+        ]
+        
         NSLayoutConstraint.activate(textViewConstraints)
         NSLayoutConstraint.activate(bubbleViewConstraints)
         NSLayoutConstraint.activate(profileImageViewConstraints)
+        NSLayoutConstraint.activate(messageImageViewConstraints)
     }
     
     required init?(coder: NSCoder) {

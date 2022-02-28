@@ -8,7 +8,7 @@
 import UIKit
 import Firebase
 
-extension LoginController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+extension LoginController {
     func handleLogin() {
         guard let email = emailTextField.text, let password = passwordTextField.text else {
             print("Form is not valid")

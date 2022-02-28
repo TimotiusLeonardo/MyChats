@@ -14,6 +14,7 @@ class ViewController: UITableViewController {
     var messages = [Message]()
     let cellId = "cellId"
     var messageDictionary = [String: Message]()
+    var timer: Timer?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -47,24 +48,12 @@ class ViewController: UITableViewController {
         }
     }
     
-    var timer: Timer?
-    
     private func fetchMessageWithMessageId(messageId: String) {
         let messageReference = Database.database().reference().child("messages").child(messageId)
         
         messageReference.observeSingleEvent(of: .value) { snapshot in
-            if let dictionary = snapshot.value as? [String: AnyObject] {
-                let message = Message()
-                guard let text = dictionary["text"] as? String,
-                      let fromId = dictionary["fromId"] as? String,
-                      let timestamp = dictionary["timestamp"] as? TimeInterval,
-                      let toId = dictionary["toId"] as? String else {
-                          return
-                      }
-                message.text = text
-                message.fromId = fromId
-                message.timestamp = timestamp
-                message.toId = toId
+            if let dictionary = snapshot.value as? [String: Any] {
+                let message = Message(dictionary: dictionary)
                 
                 if let chatPartnerId = message.chatPartnerId() {
                     self.messageDictionary[chatPartnerId] = message
