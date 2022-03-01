@@ -7,6 +7,8 @@
 
 import UIKit
 import Firebase
+import MobileCoreServices
+import AVFoundation
 
 class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
@@ -81,7 +83,8 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
     }()
     
     lazy var imagePickerController: ImagePicker = {
-        let picker = ImagePicker(presentationController: self, delegate: self)
+        let _mediaTypes = [UTType.image.identifier, UTType.movie.identifier]
+        let picker = ImagePicker(presentationController: self, delegate: self, mediaTypes: _mediaTypes)
         return picker
     }()
     
@@ -136,7 +139,7 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
                 DispatchQueue.main.async {
                     self.collectionView.reloadData()
                     if !self.messages.isEmpty {
-                        let indexPath = IndexPath(item: self.messages.count - 1, section: 0)
+                        let indexPath = IndexPath(item: 0, section: 0)
                         self.collectionView.scrollToItem(at: indexPath, at: .bottom, animated: true)
                     }
                 }
@@ -398,7 +401,23 @@ extension ChatLogController: UITextFieldDelegate {
 }
 
 extension ChatLogController: ImagePickerDelegate {
-    func didSelect(image: UIImage?) {
+    func didSelect(image: UIImage?, videoUrl: NSURL?) {
+        
+        if let videoUrl = videoUrl as URL? {
+            let storageRef = Storage.storage().reference().child("someVideoName.mp4")
+            storageRef.putFile(from: videoUrl, metadata: nil) { metadata, error in
+                if let error = error {
+                    print("Failed upload video: ", error.localizedDescription)
+                    return
+                }
+                
+                storageRef.downloadURL { url, error in
+                    print(url)
+                }
+            }
+            return
+        }
+        
         guard let image = image else {
             return
         }

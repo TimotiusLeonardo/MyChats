@@ -7,6 +7,7 @@
 
 import UIKit
 import Firebase
+import AVFoundation
 
 class LoginController: UIViewController {
     
@@ -97,7 +98,8 @@ class LoginController: UIViewController {
     }()
     
     lazy var imagePicker: ImagePicker = {
-        let picker = ImagePicker(presentationController: self, delegate: self)
+        let _mediaTypes = [UTType.image.identifier]
+        let picker = ImagePicker(presentationController: self, delegate: self, mediaTypes: _mediaTypes)
         return picker
     }()
     

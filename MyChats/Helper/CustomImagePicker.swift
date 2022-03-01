@@ -8,7 +8,7 @@
 import UIKit
 
 public protocol ImagePickerDelegate: AnyObject {
-    func didSelect(image: UIImage?)
+    func didSelect(image: UIImage?, videoUrl: NSURL?)
 }
 
 open class ImagePicker: NSObject {
@@ -17,7 +17,7 @@ open class ImagePicker: NSObject {
     private weak var presentationController: UIViewController?
     private weak var delegate: ImagePickerDelegate?
     
-    public init(presentationController: UIViewController, delegate: ImagePickerDelegate) {
+    public init(presentationController: UIViewController, delegate: ImagePickerDelegate, mediaTypes: [String]) {
         self.pickerController = UIImagePickerController()
         
         super.init()
@@ -27,7 +27,7 @@ open class ImagePicker: NSObject {
         
         self.pickerController.delegate = self
         self.pickerController.allowsEditing = true
-        self.pickerController.mediaTypes = ["public.image"]
+        self.pickerController.mediaTypes = mediaTypes
     }
     
     private func action(for type: UIImagePickerController.SourceType, title: String) -> UIAlertAction? {
@@ -63,25 +63,31 @@ open class ImagePicker: NSObject {
         self.presentationController?.present(alertController, animated: true)
     }
     
-    private func pickerController(_ controller: UIImagePickerController, didSelect image: UIImage?) {
+    private func pickerController(_ controller: UIImagePickerController, didSelect image: UIImage?, videoUrl: NSURL?) {
         controller.dismiss(animated: true, completion: nil)
         
-        self.delegate?.didSelect(image: image)
+        self.delegate?.didSelect(image: image, videoUrl: videoUrl)
     }
 }
 
 extension ImagePicker: UIImagePickerControllerDelegate {
     
     public func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        self.pickerController(picker, didSelect: nil)
+        self.pickerController(picker, didSelect: nil, videoUrl: nil)
     }
     
     public func imagePickerController(_ picker: UIImagePickerController,
                                       didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
-        guard let image = info[.editedImage] as? UIImage else {
-            return self.pickerController(picker, didSelect: nil)
+        
+        if let videoUrl = info[UIImagePickerController.InfoKey.mediaURL] as? NSURL {
+            print("The Video File Url: ", videoUrl)
+            return pickerController(picker, didSelect: nil, videoUrl: videoUrl)
         }
-        self.pickerController(picker, didSelect: image)
+        
+        guard let image = info[.editedImage] as? UIImage else {
+            return self.pickerController(picker, didSelect: nil, videoUrl: nil)
+        }
+        self.pickerController(picker, didSelect: image, videoUrl: nil)
     }
 }
 
