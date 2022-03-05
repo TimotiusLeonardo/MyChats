@@ -139,7 +139,7 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
                 DispatchQueue.main.async {
                     self.collectionView.reloadData()
                     if !self.messages.isEmpty {
-                        let indexPath = IndexPath(item: 0, section: 0)
+                        let indexPath = IndexPath(item: self.messages.count - 1, section: 0)
                         self.collectionView.scrollToItem(at: indexPath, at: .bottom, animated: true)
                     }
                 }
@@ -147,7 +147,7 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
         }
     }
     
-    private func uploadImageToFirebase(image: UIImage) {
+    private func uploadImageToFirebase(image: UIImage, completion: @escaping ((_ imageUrl: String) -> Void)) {
         let imageName = NSUUID().uuidString
         let ref = Storage.storage().reference().child("messages_images").child("\(imageName).png")
         
@@ -155,6 +155,7 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
             ref.putData(uploadData, metadata: nil) { metadata, error in
                 if let error = error {
                     print("Failed to upload messages image: ", error.localizedDescription)
+                    completion("nana")
                     return
                 }
                 
@@ -165,7 +166,7 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
                     }
                     
                     if let url = url?.absoluteString {
-                        self.sendMessageWithImageUrl(imageUrl: url, image: image)
+                        completion(url)
                     }
                 }
             }
@@ -177,6 +178,14 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
             "imageUrl": imageUrl,
             "imageWidth": image.size.width,
             "imageHeight": image.size.height,
+        ]
+        
+        sendMessageWithProperties(properties: values)
+    }
+    
+    private func sendMessageWithVideoUrl(videoUrl: String) {
+        let values: [String: Any] = [
+            "videoUrl": videoUrl
         ]
         
         sendMessageWithProperties(properties: values)
@@ -391,6 +400,71 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
             }
         }
     }
+    
+    private func convertVideo(toMP4FormatForVideo inputURL: URL, outputURL: URL, handler: @escaping (AVAssetExportSession) -> Void) {
+        try? FileManager.default.removeItem(at: outputURL)
+        let asset = AVURLAsset(url: inputURL, options: nil)
+        
+        guard let exportSession = AVAssetExportSession(asset: asset, presetName: AVAssetExportPresetHighestQuality) else {
+            return
+        }
+        
+        exportSession.outputURL = outputURL
+        exportSession.outputFileType = .mp4
+        exportSession.exportAsynchronously {
+            handler(exportSession)
+        }
+        
+    }
+    
+    private func getVideoDataFromUrl(url: URL) -> (fileName: String, fileData: Data?) {
+        let name = "\(Int(Date().timeIntervalSince1970)).mp4"
+        let path = NSTemporaryDirectory() + name
+        
+        let dispatchGroup = DispatchGroup()
+        
+        dispatchGroup.enter()
+        
+        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+        guard let outputUrl = documentsURL?.appendingPathComponent(name) else {
+            return ("",nil)
+        }
+        var uri = outputUrl
+        convertVideo(toMP4FormatForVideo: url, outputURL: outputUrl) { session in
+            guard let outputUrl = session.outputURL else {
+                return
+            }
+            
+            uri = outputUrl
+            dispatchGroup.leave()
+        }
+        
+        dispatchGroup.wait()
+        
+        let data = NSData(contentsOf: uri)
+        
+        do {
+            try data?.write(to: URL(fileURLWithPath: path), options: .atomic)
+        } catch {
+            print(error)
+        }
+        
+        return (name, data as Data?)
+    }
+    
+    private func thumbnailImageforVideoUrl(videoUrl: URL) -> UIImage? {
+        let asset = AVAsset(url: videoUrl)
+        let assetGenerator = AVAssetImageGenerator(asset: asset)
+        
+        do {
+            let thumbnailCGImage = try assetGenerator.copyCGImage(at: .init(value: 1, timescale: 60), actualTime: nil)
+            return UIImage(cgImage: thumbnailCGImage)
+        } catch {
+            print(error.localizedDescription)
+        }
+        
+        return nil
+    }
 }
 
 extension ChatLogController: UITextFieldDelegate {
@@ -401,18 +475,44 @@ extension ChatLogController: UITextFieldDelegate {
 }
 
 extension ChatLogController: ImagePickerDelegate {
-    func didSelect(image: UIImage?, videoUrl: NSURL?) {
+    func didSelect(image: UIImage?, videoUrl: URL?) {
         
-        if let videoUrl = videoUrl as URL? {
-            let storageRef = Storage.storage().reference().child("someVideoName.mp4")
-            storageRef.putFile(from: videoUrl, metadata: nil) { metadata, error in
-                if let error = error {
-                    print("Failed upload video: ", error.localizedDescription)
-                    return
+        if let videoUrl = videoUrl {
+            let fileData = getVideoDataFromUrl(url: videoUrl)
+            let storageRef = Storage.storage().reference().child("message_videos").child(fileData.fileName)
+            if let data = fileData.fileData {
+                let uploadTask = storageRef.putData(data,
+                                                    metadata: nil) { metadata, error in
+                                    if let error = error {
+                                        print("Failed upload video: ", error.localizedDescription)
+                                        return
+                                    }
+                                    
+                                    storageRef.downloadURL { url, error in
+                                        if let url = url?.absoluteString {
+                                            if let thumbnailImage = self.thumbnailImageforVideoUrl(videoUrl: videoUrl) {
+                                                
+                                                self.uploadImageToFirebase(image: thumbnailImage) { imageUrl in
+                                                    let properties: [String: Any] = [
+                                                        "imageWidth": thumbnailImage.size.width,
+                                                        "imageHeight": thumbnailImage.size.height,
+                                                        "videoUrl": url,
+                                                        "imageUrl": imageUrl
+                                                    ]
+                                                    self.sendMessageWithProperties(properties: properties)
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                uploadTask.observe(.progress) { snapshot in
+                    if let completedUnitCount = snapshot.progress?.completedUnitCount {
+                        self.navigationItem.title = String(completedUnitCount)
+                    }
                 }
                 
-                storageRef.downloadURL { url, error in
-                    print(url)
+                uploadTask.observe(.success) { snapshot in
+                    self.navigationItem.title = self.user?.name
                 }
             }
             return
@@ -422,6 +522,8 @@ extension ChatLogController: ImagePickerDelegate {
             return
         }
         
-        uploadImageToFirebase(image: image)
+        uploadImageToFirebase(image: image) { imageUrl in
+            self.sendMessageWithImageUrl(imageUrl: imageUrl, image: image)
+        }
     }
 }

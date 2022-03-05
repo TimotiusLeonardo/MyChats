@@ -168,7 +168,7 @@ extension LoginController {
 }
 
 extension LoginController: ImagePickerDelegate {
-    func didSelect(image: UIImage?, videoUrl: NSURL?) {
+    func didSelect(image: UIImage?, videoUrl: URL?) {
         if let selectedImageFromPicker = image {
             profileImageView.image = selectedImageFromPicker
         }

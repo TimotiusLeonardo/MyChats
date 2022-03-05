@@ -8,7 +8,7 @@
 import UIKit
 
 public protocol ImagePickerDelegate: AnyObject {
-    func didSelect(image: UIImage?, videoUrl: NSURL?)
+    func didSelect(image: UIImage?, videoUrl: URL?)
 }
 
 open class ImagePicker: NSObject {
@@ -63,7 +63,7 @@ open class ImagePicker: NSObject {
         self.presentationController?.present(alertController, animated: true)
     }
     
-    private func pickerController(_ controller: UIImagePickerController, didSelect image: UIImage?, videoUrl: NSURL?) {
+    private func pickerController(_ controller: UIImagePickerController, didSelect image: UIImage?, videoUrl: URL?) {
         controller.dismiss(animated: true, completion: nil)
         
         self.delegate?.didSelect(image: image, videoUrl: videoUrl)
@@ -79,7 +79,7 @@ extension ImagePicker: UIImagePickerControllerDelegate {
     public func imagePickerController(_ picker: UIImagePickerController,
                                       didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
         
-        if let videoUrl = info[UIImagePickerController.InfoKey.mediaURL] as? NSURL {
+        if let videoUrl = info[UIImagePickerController.InfoKey.mediaURL] as? URL {
             print("The Video File Url: ", videoUrl)
             return pickerController(picker, didSelect: nil, videoUrl: videoUrl)
         }
