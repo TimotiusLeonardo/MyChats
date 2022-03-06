@@ -90,7 +90,7 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
     
     lazy var loadingBackgroundView: UIView = {
         let backgroundView = UIView()
-        backgroundView.backgroundColor = .gray
+        backgroundView.backgroundColor = .black
         backgroundView.alpha = 0
         backgroundView.translatesAutoresizingMaskIntoConstraints = false
         return backgroundView
