@@ -24,6 +24,7 @@ class ViewController: UITableViewController {
         tableView.register(UserCell.self, forCellReuseIdentifier: cellId)
         checkIfUserIsLoggedIn()
         observeUserMessages()
+        tableView.allowsMultipleSelectionDuringEditing = true
     }
     
     private func checkIfUserIsLoggedIn() {
@@ -45,6 +46,12 @@ class ViewController: UITableViewController {
                 let messageId = snapshot.key
                 self.fetchMessageWithMessageId(messageId: messageId)
             }
+        }
+        
+        ref.observe(.childRemoved) { snapshot in
+            print(snapshot.key)
+            self.messageDictionary.removeValue(forKey: snapshot.key)
+            self.attemptReloadTable()
         }
     }
     
@@ -227,7 +234,34 @@ class ViewController: UITableViewController {
             user.id = chatPartnerId
             self.redirectToChatController(user: user)
         }
+    }
+    
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        true
+    }
+    
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        guard let uid = Auth.auth().currentUser?.uid else {
+            return
+        }
         
+        let message = self.messages[indexPath.row]
+        if let chatPartnerId = message.chatPartnerId() {
+            Database.database().reference().child("user-messages").child(uid).child(chatPartnerId).removeValue { error, reference in
+                if error != nil {
+                    print("Failed to delete message: ", error?.localizedDescription ?? "Error delete message")
+                    return
+                }
+                
+                self.messageDictionary.removeValue(forKey: chatPartnerId)
+                self.messages.remove(at: indexPath.row)
+                self.tableView.deleteRows(at: [indexPath], with: .left)
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    self.attemptReloadTable()
+                }
+            }
+        }
     }
 }
 
