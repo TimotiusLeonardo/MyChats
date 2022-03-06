@@ -27,6 +27,7 @@ class ChatMessageCell: UICollectionViewCell {
     lazy var activityIndicatorView: UIActivityIndicatorView = {
         let view = UIActivityIndicatorView(style: .large)
         view.translatesAutoresizingMaskIntoConstraints = false
+        view.color = .white
         return view
     }()
     

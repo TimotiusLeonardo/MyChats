@@ -88,6 +88,21 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
         return picker
     }()
     
+    lazy var loadingBackgroundView: UIView = {
+        let backgroundView = UIView()
+        backgroundView.backgroundColor = .gray
+        backgroundView.alpha = 0
+        backgroundView.translatesAutoresizingMaskIntoConstraints = false
+        return backgroundView
+    }()
+    
+    lazy var loadingView: UIActivityIndicatorView = {
+        let indicatorView = UIActivityIndicatorView()
+        indicatorView.color = .white
+        indicatorView.translatesAutoresizingMaskIntoConstraints = false
+        return indicatorView
+    }()
+    
     override var inputAccessoryView: UIView? {
         get {
             return inputContainerView
@@ -105,6 +120,29 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
         collectionView.contentInset = .init(top: 8, left: 0, bottom: 8, right: 0)
         collectionView.keyboardDismissMode = .interactive
         hideKeyboardWhenTappedAround()
+        setupLoadingView()
+    }
+    
+    private func setupLoadingView() {
+        view.addSubview(loadingBackgroundView)
+        loadingBackgroundView.addSubview(loadingView)
+        
+        let loadingBackgroundViewContraints = [
+            loadingBackgroundView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            loadingBackgroundView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            loadingBackgroundView.topAnchor.constraint(equalTo: view.topAnchor),
+            loadingBackgroundView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ]
+        
+        let loadingIndicatorViewConstraints = [
+            loadingView.centerXAnchor.constraint(equalTo: loadingBackgroundView.centerXAnchor),
+            loadingView.centerYAnchor.constraint(equalTo: loadingBackgroundView.centerYAnchor),
+            loadingView.widthAnchor.constraint(equalToConstant: 50),
+            loadingView.heightAnchor.constraint(equalToConstant: 50)
+        ]
+        
+        NSLayoutConstraint.activate(loadingBackgroundViewContraints)
+        NSLayoutConstraint.activate(loadingIndicatorViewConstraints)
     }
     
     /// For changing traits
@@ -152,16 +190,18 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
         let ref = Storage.storage().reference().child("messages_images").child("\(imageName).png")
         
         if let uploadData = image.jpegData(compressionQuality: 0.2) {
-            ref.putData(uploadData, metadata: nil) { metadata, error in
+            setViewToLoadingState(to: true)
+            let uploadTask = ref.putData(uploadData, metadata: nil) { metadata, error in
                 if let error = error {
                     print("Failed to upload messages image: ", error.localizedDescription)
-                    completion("nana")
+                    self.setViewToLoadingState(to: false)
                     return
                 }
                 
                 ref.downloadURL { url, error in
                     if let error = error {
                         print("Failed to upload messages image: ", error.localizedDescription)
+                        self.setViewToLoadingState(to: false)
                         return
                     }
                     
@@ -169,6 +209,10 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
                         completion(url)
                     }
                 }
+            }
+            
+            uploadTask.observe(.success) { snapshot in
+                self.setViewToLoadingState(to: false)
             }
         }
     }
@@ -312,6 +356,22 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
         }
         
         cell.chatLogController = self
+    }
+    
+    private func setViewToLoadingState(to isLoading: Bool) {
+        if isLoading {
+            loadingView.startAnimating()
+            inputAccessoryView?.isHidden = true
+        } else {
+            loadingView.stopAnimating()
+            inputAccessoryView?.isHidden = false
+        }
+        
+        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseOut) {
+            self.loadingBackgroundView.alpha = isLoading ? 0.8 : 0
+        } completion: { _ in
+            //
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -492,10 +552,12 @@ extension ChatLogController: ImagePickerDelegate {
             let fileData = getVideoDataFromUrl(url: videoUrl)
             let storageRef = Storage.storage().reference().child("message_videos").child(fileData.fileName)
             if let data = fileData.fileData {
+                setViewToLoadingState(to: true)
                 let uploadTask = storageRef.putData(data,
                                                     metadata: nil) { metadata, error in
                                     if let error = error {
                                         print("Failed upload video: ", error.localizedDescription)
+                                        self.setViewToLoadingState(to: false)
                                         return
                                     }
                                     
@@ -524,6 +586,7 @@ extension ChatLogController: ImagePickerDelegate {
                 
                 uploadTask.observe(.success) { snapshot in
                     self.navigationItem.title = self.user?.name
+                    self.setViewToLoadingState(to: false)
                 }
             }
             return
