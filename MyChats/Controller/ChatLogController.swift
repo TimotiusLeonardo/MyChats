@@ -271,6 +271,7 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
     }
     
     private func setupCell(cell: ChatMessageCell, message: Message) {
+        cell.message = message
         if let profileImageUrl = self.user?.profileImageUrl {
             cell.profileImageView.loadImageUsingCacheWithUrlString(urlString: profileImageUrl)
         }
@@ -291,13 +292,23 @@ class ChatLogController: UICollectionViewController, UICollectionViewDelegateFlo
             cell.bubbleViewLeftAnchor?.isActive = true
         }
         
-        if let messageImageUrl = message.imageUrl {
+        if let messageVideoUrl = message.videoUrl {
+            if let messageImageUrl = message.imageUrl {
+                cell.messageImageView.loadImageUsingCacheWithUrlString(urlString: messageImageUrl)
+                cell.messageImageView.isHidden = false
+                cell.bubbleView.backgroundColor = .lightGray
+                cell.playButton.isHidden = false
+                cell.videoUrl = URL(string: messageVideoUrl)
+            }
+        } else if let messageImageUrl = message.imageUrl {
             cell.messageImageView.loadImageUsingCacheWithUrlString(urlString: messageImageUrl)
             cell.messageImageView.isHidden = false
             cell.bubbleView.backgroundColor = .lightGray
+            cell.playButton.isHidden = true
         } else {
             cell.messageImageView.isHidden = true
             cell.bubbleView.backgroundColor = ChatMessageCell.blueColor
+            cell.playButton.isHidden = true
         }
         
         cell.chatLogController = self
