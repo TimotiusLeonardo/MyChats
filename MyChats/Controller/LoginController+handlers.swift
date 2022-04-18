@@ -131,6 +131,8 @@ extension LoginController {
         nameTextFieldHeightAnchor?.isActive = false
         passwordTextFieldHeightAnchor?.isActive = false
         emailTextFieldHeightAnchor?.isActive = false
+        profileImageView.isUserInteractionEnabled = loginRegisterSegmentedControl.selectedSegmentIndex == 0 ? false : true
+        profileImageView.image = loginRegisterSegmentedControl.selectedSegmentIndex == 0 ? UIImage(named: "frontIcon") : UIImage(named: "ic-avatar")
         
         nameTextFieldHeightAnchor = nameTextField.heightAnchor.constraint(equalTo: inputContainerView.heightAnchor,
                                                                           multiplier: loginRegisterSegmentedControl.selectedSegmentIndex == 0 ? 0 : 1/3)

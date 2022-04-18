@@ -68,6 +68,7 @@ open class ImagePicker: NSObject {
         
         self.delegate?.didSelect(image: image, videoUrl: videoUrl)
     }
+    
 }
 
 extension ImagePicker: UIImagePickerControllerDelegate {
